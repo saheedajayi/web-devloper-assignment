@@ -1,5 +1,6 @@
+"use client"
 import { useQuery } from "@tanstack/react-query"
-import { UserService } from "../services/user.service"
+import { UserService } from "@/services/user.service"
 
 export const useUsers = (pageNumber = 0, pageSize = 4) => {
     return useQuery({
@@ -18,3 +19,4 @@ export const useUsersCount = () => {
         gcTime: 10 * 60 * 1000,
     })
 }
+

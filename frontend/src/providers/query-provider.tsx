@@ -6,7 +6,7 @@ import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 import {useState} from "react"
 import type {AxiosError} from "axios"
 
-// Type guard to check if an error is AxiosError
+
 function isAxiosError(error: unknown): error is AxiosError {
     return typeof error === "object" && error !== null && "isAxiosError" in error && (error as AxiosError).isAxiosError
 }
@@ -17,8 +17,8 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
             new QueryClient({
                 defaultOptions: {
                     queries: {
-                        staleTime: 60 * 1000, // 1 minute
-                        gcTime: 5 * 60 * 1000, // 5 minutes
+                        staleTime: 60 * 1000,
+                        gcTime: 5 * 60 * 1000,
                         retry: (failureCount: number, error: unknown) => {
                             if (isAxiosError(error)) {
                                 const status = error.response?.status

@@ -1,13 +1,3 @@
-// import { Factory } from "fishery"
-// import {User} from "@/types/user";
-
-// export const UserFactory = Factory.define<User>(({ sequence }) => ({
-//     id: sequence.toString(),
-//     name: `Test User ${sequence}`,
-//     email: `user${sequence}@test.com`,
-//     address: `${sequence} Test Street, Test City, T1T 1T1`,
-// }));
-
 import { Factory } from "fishery"
 import { UserFromAPI } from "@/types/user"
 

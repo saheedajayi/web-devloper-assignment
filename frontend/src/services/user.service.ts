@@ -1,33 +1,42 @@
 import axios from "axios"
-import {UserFromAPI, UsersCountResponse, UsersResponse} from "@/types/user";
+import type { UserFromAPI, UsersCountResponse, UsersResponse } from "@/types/user"
 
+const baseURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`
 
-export class UserService {
-    private static baseURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`
-
-    static async getUsers(pageNumber = 0, pageSize = 4): Promise<UsersResponse> {
-        try {
-            const response = await axios.get<UserFromAPI[]>(this.baseURL, {
-                params: { pageNumber, pageSize },
-            })
-
-            const countResponse = await axios.get<UsersCountResponse>(`${this.baseURL}/count`)
-
-            return {
-                users: response.data,
-                totalCount: countResponse.data.count,
-            }
-        } catch (error) {
-            throw new Error("Failed to fetch users")
-        }
+function handleError(error: unknown, defaultMessage: string): never {
+    if (axios.isAxiosError(error)) {
+        throw new Error(`${defaultMessage}: ${error.message}`)
     }
+    throw new Error(`${defaultMessage}: Unknown error`)
+}
 
-    static async getUsersCount(): Promise<number> {
-        try {
-            const response = await axios.get<UsersCountResponse>(`${this.baseURL}/count`)
-            return response.data.count
-        } catch (error) {
-            throw new Error("Failed to fetch users count")
+async function getUsers(pageNumber = 0, pageSize = 4): Promise<UsersResponse> {
+    try {
+        const response = await axios.get<UserFromAPI[]>(baseURL, {
+            params: { pageNumber, pageSize },
+        })
+
+        const countResponse = await axios.get<UsersCountResponse>(`${baseURL}/count`)
+
+        return {
+            users: response.data,
+            totalCount: countResponse.data.count,
         }
+    } catch (error: unknown) {
+        handleError(error, "Failed to fetch users")
     }
+}
+
+async function getUsersCount(): Promise<number> {
+    try {
+        const response = await axios.get<UsersCountResponse>(`${baseURL}/count`)
+        return response.data.count
+    } catch (error: unknown) {
+        handleError(error, "Failed to fetch users count")
+    }
+}
+
+export const UserService = {
+    getUsers,
+    getUsersCount,
 }

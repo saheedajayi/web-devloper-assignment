@@ -7,7 +7,7 @@ import NewPostModal from "@/components/new-post-modal"
 import {User} from "@/types/user";
 
 
-export default function HomePage() {
+export default function MainPage() {
     const [currentView, setCurrentView] = useState<"users" | "profile">("users")
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
     const [showNewPostModal, setShowNewPostModal] = useState(false)

@@ -5,13 +5,13 @@ export interface Address {
   zipcode: string;
 }
 
-export interface User {
+export interface User extends  Address{
   id: number;
   name: string;
   username: string;
   email: string;
   phone: string;
-  address: Address
+  // address: Address
 }
 
 export type Pagination = {

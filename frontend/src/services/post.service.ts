@@ -1,45 +1,50 @@
 import axios from "axios"
-import {CreatePostRequest, CreatePostResponse, Post} from "@/types/post";
+import type { CreatePostRequest, CreatePostResponse, Post } from "@/types/post"
 
+const baseURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`
 
-export class PostService {
-    private static baseURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`
-
-    static async getPosts(userId: string): Promise<Post[]> {
-        try {
-            const response = await axios.get<Post[]>(this.baseURL, {
-                params: { userId },
-            })
-            return response.data
-        } catch (error) {
-            throw new Error(`Failed to fetch posts ${error}`)
+function handleError(error: unknown, defaultMessage: string, notFoundMessage?: string): never {
+    if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404 && notFoundMessage) {
+            throw new Error(notFoundMessage)
         }
+        throw new Error(`${defaultMessage}: ${error.message}`)
     }
+    throw new Error(`${defaultMessage}: Unknown error`)
+}
 
-    static async createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
-        try {
-            const response = await axios.post<CreatePostResponse>(this.baseURL, data)
-            return response.data
-        } catch (error: unknown) {
-            // @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            if (error.response?.status === 404) {
-                throw new Error("User not found")
-            }
-            throw new Error("Failed to create post")
-        }
-    }
-
-    static async deletePost(postId: string): Promise<void> {
-        try {
-            await axios.delete(`${this.baseURL}/${postId}`)
-        } catch (error: unknown) {
-            // @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            if (error.response?.status === 404) {
-                throw new Error("Post not found")
-            }
-            throw new Error("Failed to delete post")
-        }
+async function getPosts(userId: string): Promise<Post[]> {
+    try {
+        const response = await axios.get<Post[]>(baseURL, {
+            params: { userId },
+        })
+        return response.data
+    } catch (error: unknown) {
+        handleError(error, "Failed to fetch posts")
     }
 }
+
+async function createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
+    try {
+        const response = await axios.post<CreatePostResponse>(baseURL, data)
+        return response.data
+    } catch (error: unknown) {
+        handleError(error, "Failed to create post", "User not found")
+    }
+}
+
+async function deletePost(postId: string): Promise<void> {
+    try {
+        await axios.delete(`${baseURL}/${postId}`)
+    } catch (error: unknown) {
+        handleError(error, "Failed to delete post", "Post not found")
+    }
+}
+
+export const PostService = {
+    getPosts,
+    createPost,
+    deletePost,
+}
+
+

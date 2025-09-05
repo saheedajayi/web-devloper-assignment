@@ -39,12 +39,12 @@ export const getUsers = (
                   username: user.username,
                   email: user.email,
                   phone: user.phone,
-                  address: {
+                  // address: {
                       street: user.street,
                       city: user.city,
                       state: user.state,
                       zipcode: user.zipcode,
-                  },
+                  // },
               };
           });
 

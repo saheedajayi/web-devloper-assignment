@@ -28,12 +28,16 @@ export default function MainPage() {
                 <UsersTable onUserClick={handleUserClick} />
             ) : (
                 selectedUser && (
-                    <UserProfile user={selectedUser} onBack={handleBackToUsers} onNewPost={() => setShowNewPostModal(true)} />
+                    <UserProfile user={selectedUser} onBack={handleBackToUsers} />
                 )
             )}
 
-            {showNewPostModal && selectedUser && (
-                <NewPostModal userId={selectedUser.id.toString()} onClose={() => setShowNewPostModal(false)} />
+            {selectedUser && (
+                <NewPostModal
+                    userId={selectedUser.id.toString()}
+                    open={showNewPostModal}
+                    onClose={() => setShowNewPostModal(false)}
+                />
             )}
         </div>
     )

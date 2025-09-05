@@ -120,7 +120,6 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
                 )}
             </div>
 
-            {/* New Post Modal */}
             <NewPostModal
                 userId={user.id.toString()}
                 open={isNewPostOpen}

@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import {FormEvent, useState} from "react"
 import { useCreatePost } from "@/hooks/use-posts"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -26,7 +25,7 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
     const [content, setContent] = useState("")
     const createPostMutation = useCreatePost()
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         if (title.trim() && content.trim()) {
             try {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/src/app/globals.css;/Users/admin/WebstormProjects/frontend-assignment/src/app/layout.tsx;/Users/admin/WebstormProjects/frontend-assignment/src/app/page.tsx;/Users/admin/WebstormProjects/frontend-assignment/src/components/new-post-modal.tsx;/Users/admin/WebstormProjects/frontend-assignment/src/components/user-profile.tsx;/Users/admin/WebstormProjects/frontend-assignment/src/components/users-table.tsx;/Users/admin/WebstormProjects/frontend-assignment/src/lib/mock.ts;/Users/admin/WebstormProjects/frontend-assignment/src/page/main-page.tsx;/Users/admin/WebstormProjects/frontend-assignment/next.config.ts;/Users/admin/WebstormProjects/frontend-assignment/package-lock.json;/Users/admin/WebstormProjects/frontend-assignment/package.json;/Users/admin/WebstormProjects/frontend-assignment/README.md;/Users/admin/WebstormProjects/frontend-assignment/tsconfig.json" />
+  </component>
+</project>

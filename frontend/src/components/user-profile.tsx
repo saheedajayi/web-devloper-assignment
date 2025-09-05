@@ -20,6 +20,14 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
         }
     }
 
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-full py-12">
+                <Loader />
+            </div>
+        )
+    }
+
     return (
         <div className="bg-white">
             <div className="p-4 sm:p-6">
@@ -35,14 +43,8 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
                     {user.name}
                 </h1>
                 <p className="text-gray-600 mb-8 text-sm sm:text-base">
-                    {user.email} • {isLoading ? <Loader /> : `${posts.length} Posts`}
+                    {user.email} • {posts.length} Posts
                 </p>
-
-                {isLoading && (
-                    <div className="flex justify-center items-center py-12">
-                        <Loader />
-                    </div>
-                )}
 
                 {error && (
                     <div className="flex justify-center items-center py-12">
@@ -55,8 +57,9 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
                     </div>
                 )}
 
-                {!isLoading && !error && (
+                {!error && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                        {/* Add new post card */}
                         <div
                             className="w-[270px] h-[293px] border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center hover:border-gray-400 cursor-pointer transition-colors"
                             onClick={() => setIsNewPostOpen(true)}
@@ -79,7 +82,7 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
                             <span className="text-gray-600 font-medium">New Post</span>
                         </div>
 
-                        {/* Posts */}
+
                         {posts.map((post) => (
                             <div
                                 key={post.id}

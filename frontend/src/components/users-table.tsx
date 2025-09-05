@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate"
 import {useUsers} from "@/hooks/use-users"
 import {User, UserFromAPI} from "@/types/user";
 import Loader from "@/components/loader";
+import {ArrowLeft, ArrowRight} from "lucide-react";
 
 interface UsersTableProps {
     onUserClick: (user: User) => void
@@ -27,25 +28,24 @@ function UsersTable({onUserClick}: UsersTableProps) {
     })
 
     const users = data?.users.map(mapUserFromAPI) || []
-    // const users = data?.users || []
     const totalCount = data?.totalCount || 0
     const pageCount = Math.ceil(totalCount / itemsPerPage)
 
 
     return (
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white">
             <div className="p-6">
-                <h1 className="text-4xl font-bold text-gray-900 mb-8">Users</h1>
+                <h1 className="text-5xl font-[500] text-gray-900 mb-8">Users</h1>
 
-                <div className="overflow-hidden">
-                    <table className="table-fixed w-full">
+                <div className="overflow-hidden rounded-lg border border-gray-200 ">
+                    <table className="table-fixed w-full ">
                         <thead>
-                        <tr className="border-b border-gray-200">
-                            <th className="text-left py-4 px-0 text-sm font-medium text-gray-500">Full Name</th>
-                            <th className="text-left py-4 px-0 text-sm font-medium text-gray-500 hidden sm:table-cell">
+                        <tr>
+                            <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Full Name</th>
+                            <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 hidden sm:table-cell">
                                 Email Address
                             </th>
-                            <th className="text-left py-4 px-0 text-sm font-medium text-gray-500 hidden md:table-cell">Address</th>
+                            <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 hidden md:table-cell">Address</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -72,10 +72,10 @@ function UsersTable({onUserClick}: UsersTableProps) {
                             users.map((user) => (
                                 <tr
                                     key={user.id}
-                                    className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                                    className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
                                     onClick={() => onUserClick(user)}
                                 >
-                                    <td className="py-6 px-0">
+                                    <td className="p-6">
                                         <div>
                                             <div className="text-gray-900 font-medium">{user.name}</div>
                                             <div className="text-gray-600 text-sm sm:hidden">{user.email}</div>
@@ -86,11 +86,9 @@ function UsersTable({onUserClick}: UsersTableProps) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-6 px-0 text-gray-600 hidden sm:table-cell">{user.email}</td>
-                                    <td className="py-6 px-0 text-gray-600 hidden md:table-cell max-w-0">
-                                        {/*<div className="truncate" title={formatAddress(user)}>*/}
+                                    <td className="p-6 text-gray-600 hidden sm:table-cell">{user.email}</td>
+                                    <td className="p-6 text-gray-600 hidden md:table-cell max-w-0">
                                         <div className="truncate" title={user.address}>
-                                            {/*{formatAddress(user)}*/}
                                             {user.address}
                                         </div>
                                     </td>
@@ -102,10 +100,20 @@ function UsersTable({onUserClick}: UsersTableProps) {
                 </div>
 
                 {!isLoading && !error && pageCount > 1 && (
-                    <div className="flex justify-center mt-8">
+                    <div className="flex justify-end mt-8">
                         <ReactPaginate
-                            previousLabel="← Previous"
-                            nextLabel="Next →"
+                            previousLabel={
+                                <div className="flex gap-2">
+                                    <ArrowLeft size={20}/>
+                                    Previous
+                                </div>
+                            }
+                            nextLabel={
+                                <div className="flex gap-2">
+                                    Next
+                                    <ArrowRight size={20}/>
+                                </div>
+                            }
                             pageCount={pageCount}
                             onPageChange={handlePageClick}
                             forcePage={currentPage}

@@ -1,18 +1,16 @@
 "use client"
 
-import { memo } from "react"
-import { usePosts, useDeletePost } from "@/hooks/use-posts"
-import {User} from "@/types/user";
+import {memo, useState} from "react"
+import {usePosts, useDeletePost} from "@/hooks/use-posts"
+import {User} from "@/types/user"
+import Loader from "@/components/loader"
+import NewPostModal from "@/components/new-post-modal"
+import {ArrowLeft} from "lucide-react";
 
-interface UserProfileProps {
-    user: User
-    onBack: () => void
-    onNewPost: () => void
-}
-
-function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
-    const { data: posts = [], isLoading, error } = usePosts(user.id.toString())
+function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
+    const {data: posts = [], isLoading, error} = usePosts(user.id.toString())
     const deletePostMutation = useDeletePost()
+    const [isNewPostOpen, setIsNewPostOpen] = useState(false)
 
     const handleDeletePost = async (postId: string) => {
         try {
@@ -23,24 +21,26 @@ function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white">
             <div className="p-4 sm:p-6">
-                <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
+                <button
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors cursor-pointer"
+                >
+                    <ArrowLeft size={20}/>
                     Back to Users
                 </button>
 
-                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">{user.name}</h1>
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">
+                    {user.name}
+                </h1>
                 <p className="text-gray-600 mb-8 text-sm sm:text-base">
-                    {user.email} • {isLoading ? "Loading..." : `${posts.length} Posts`}
+                    {user.email} • {isLoading ? <Loader /> : `${posts.length} Posts`}
                 </p>
 
                 {isLoading && (
                     <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <span className="ml-3 text-gray-600">Loading posts...</span>
+                        <Loader />
                     </div>
                 )}
 
@@ -48,21 +48,32 @@ function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
                     <div className="flex justify-center items-center py-12">
                         <div className="text-red-600 text-center">
                             <p className="font-medium">Error loading posts</p>
-                            <p className="text-sm text-gray-600 mt-1">Please try again later</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Please try again later
+                            </p>
                         </div>
                     </div>
                 )}
 
                 {!isLoading && !error && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                        {/* New Post Button */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                         <div
-                            className="border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center hover:border-gray-400 cursor-pointer transition-colors"
-                            onClick={onNewPost}
+                            className="w-[270px] h-[293px] border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center hover:border-gray-400 cursor-pointer transition-colors"
+                            onClick={() => setIsNewPostOpen(true)}
                         >
                             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                <svg
+                                    className="w-6 h-6 text-gray-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                    />
                                 </svg>
                             </div>
                             <span className="text-gray-600 font-medium">New Post</span>
@@ -70,7 +81,10 @@ function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
 
                         {/* Posts */}
                         {posts.map((post) => (
-                            <div key={post.id} className="border border-gray-200 rounded-lg p-4 sm:p-6 relative">
+                            <div
+                                key={post.id}
+                                className="w-[270px] h-[293px] border border-gray-200 rounded-lg p-4 sm:p-6 relative hover:shadow-md flex flex-col"
+                            >
                                 <button
                                     onClick={() => handleDeletePost(post.id)}
                                     disabled={deletePostMutation.isPending}
@@ -79,7 +93,12 @@ function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
                                     {deletePostMutation.isPending ? (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400"></div>
                                     ) : (
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -89,13 +108,24 @@ function UserProfile({ user, onBack, onNewPost }: UserProfileProps) {
                                         </svg>
                                     )}
                                 </button>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-3 pr-8">{post.title}</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">{post.body}</p>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3 pr-8 line-clamp-2">
+                                    {post.title}
+                                </h3>
+                                <p className="text-gray-600 text-sm leading-relaxed overflow-hidden line-clamp-6 flex-grow">
+                                    {post.body}
+                                </p>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* New Post Modal */}
+            <NewPostModal
+                userId={user.id.toString()}
+                open={isNewPostOpen}
+                onClose={() => setIsNewPostOpen(false)}
+            />
         </div>
     )
 }

@@ -23,22 +23,24 @@ export default function MainPage() {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center mx-auto max-w-5xl  p-4 sm:p-8">
-            {currentView === "users" ? (
-                <UsersTable onUserClick={handleUserClick} />
-            ) : (
-                selectedUser && (
-                    <UserProfile user={selectedUser} onBack={handleBackToUsers} />
-                )
-            )}
+        <div className="min-h-screen w-full">
+            <div className="mx-auto max-w-5xl p-4 sm:p-8">
+                {currentView === "users" ? (
+                    <UsersTable onUserClick={handleUserClick} />
+                ) : (
+                    selectedUser && (
+                        <UserProfile user={selectedUser} onBack={handleBackToUsers} />
+                    )
+                )}
 
-            {selectedUser && (
-                <NewPostModal
-                    userId={selectedUser.id.toString()}
-                    open={showNewPostModal}
-                    onClose={() => setShowNewPostModal(false)}
-                />
-            )}
+                {selectedUser && (
+                    <NewPostModal
+                        userId={selectedUser.id.toString()}
+                        open={showNewPostModal}
+                        onClose={() => setShowNewPostModal(false)}
+                    />
+                )}
+            </div>
         </div>
     )
 }

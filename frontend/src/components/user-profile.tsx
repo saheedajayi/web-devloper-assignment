@@ -58,7 +58,7 @@ function UserProfile({user, onBack}: {user: User; onBack: () => void}) {
                 )}
 
                 {!error && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 justify-items-center">
                         {/* Add new post card */}
                         <div
                             className="w-[270px] h-[293px] border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center hover:border-gray-400 cursor-pointer transition-colors"

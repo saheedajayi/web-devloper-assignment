@@ -102,7 +102,7 @@ describe("UsersTable", () => {
     const mockUsers = UserFactory.buildList(4)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 20, // More than one page
+      totalCount: 20, // More than one page (5 pages total)
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
@@ -114,35 +114,51 @@ describe("UsersTable", () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText("Next →")).toBeInTheDocument()
+      expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
+
+    // Use getAllByText to handle multiple pagination instances (mobile + desktop)
+    const pageOneButtons = screen.getAllByText("1")
+    expect(pageOneButtons).toHaveLength(2) // Should have 2 instances (mobile + desktop)
+
+    // Verify pagination navigation exists by checking for navigation role
+    const paginationNav = screen.getAllByRole('navigation')
+    expect(paginationNav).toHaveLength(2) // Mobile and desktop versions
+
+    // Check for page 5 (last page based on totalCount=20, itemsPerPage=4)
+    const pageFiveButtons = screen.getAllByText("5")
+    expect(pageFiveButtons.length).toBeGreaterThan(0)
   })
 
-  // it("calls onUserClick when user row is clicked", async () => {
-  //   const mockUsers = UserFactory.buildList(1)
-  //   const mockResponse = {
-  //     users: mockUsers,
-  //     totalCount: 1,
-  //   }
-  //
-  //   mockedUserService.getUsers.mockResolvedValue(mockResponse)
-  //
-  //   render(
-  //       <TestWrapper>
-  //         <UsersTable onUserClick={mockOnUserClick} />
-  //       </TestWrapper>,
-  //   )
-  //
-  //   await waitFor(() => {
-  //     expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
-  //   })
-  //
-  //   // Click on the user row
-  //   const userRow = screen.getByText(mockUsers[0].name).closest("tr")
-  //   await userEvent.click(userRow!)
-  //
-  //   expect(mockOnUserClick).toHaveBeenCalledWith(mockUsers[0])
-  // })
+  it("handles pagination navigation", async () => {
+    const mockUsers = UserFactory.buildList(4)
+    const mockResponse = {
+      users: mockUsers,
+      totalCount: 12, // 3 pages total
+    }
+
+    mockedUserService.getUsers.mockResolvedValue(mockResponse)
+
+    render(
+        <TestWrapper>
+          <UsersTable onUserClick={mockOnUserClick} />
+        </TestWrapper>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
+    })
+
+    // Check that pagination renders with correct page count (using getAllByText for duplicates)
+    expect(screen.getAllByText("1")).toHaveLength(2) // Mobile + desktop
+    expect(screen.getAllByText("2")).toHaveLength(2)
+    expect(screen.getAllByText("3")).toHaveLength(2)
+
+    // Verify we're on page 1 by checking for active styling
+    const pageOneButtons = screen.getAllByText("1")
+    expect(pageOneButtons[0].closest('a')).toHaveClass('!text-blue-600')
+    expect(pageOneButtons[1].closest('a')).toHaveClass('!text-blue-600')
+  })
 
   it("calls onUserClick when user row is clicked", async () => {
     const mockUsers = UserFactory.buildList(1)

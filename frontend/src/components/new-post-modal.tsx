@@ -61,6 +61,7 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Give your post a title"
                             disabled={createPostMutation.isPending}
+                            className="rounded-[4px]"
                         />
                     </div>
 
@@ -74,7 +75,7 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
                             placeholder="Write something mind-blowing"
                             rows={8}
                             disabled={createPostMutation.isPending}
-                            className="h-[179px]"
+                            className="h-[179px] rounded-[4px]"
                         />
                     </div>
 
@@ -102,10 +103,11 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
                                 !title.trim() ||
                                 !content.trim()
                             }
+                            className="rounded-[4px]"
                         >
                             {createPostMutation.isPending ? (
-                                <div className="flex gap-3">
-                                    Publish <Loader/>
+                                <div className="flex gap-3 items-center mx-4">
+                                    Publish <Loader size={40} />
                                 </div>
                             ) : (
                                 "Publish"

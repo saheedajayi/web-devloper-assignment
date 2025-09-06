@@ -1,18 +1,14 @@
 "use client"
 
-import {FormEvent, useState} from "react"
+import type React from "react"
+
+import { type FormEvent, useState, useCallback } from "react"
 import { useCreatePost } from "@/hooks/use-posts"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import Loader from "@/components/loader";
+import Loader from "@/components/loader"
 
 interface NewPostModalProps {
     userId: string
@@ -25,23 +21,38 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
     const [content, setContent] = useState("")
     const createPostMutation = useCreatePost()
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault()
-        if (title.trim() && content.trim()) {
-            try {
-                await createPostMutation.mutateAsync({
-                    title: title.trim(),
-                    body: content.trim(),
-                    userId,
-                })
-                setTitle("")
-                setContent("")
-                onClose()
-            } catch (error) {
-                console.error("Failed to create post:", error)
+    const handleSubmit = useCallback(
+        async (e: FormEvent) => {
+            e.preventDefault()
+            if (title.trim() && content.trim()) {
+                try {
+                    await createPostMutation.mutateAsync({
+                        title: title.trim(),
+                        body: content.trim(),
+                        userId,
+                    })
+                    setTitle("")
+                    setContent("")
+                    onClose()
+                } catch (error) {
+                    console.error("Failed to create post:", error)
+                }
             }
-        }
-    }
+        },
+        [title, content, userId, createPostMutation, onClose],
+    )
+
+    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value)
+    }, [])
+
+    const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setContent(e.target.value)
+    }, [])
+
+    const handleCancel = useCallback(() => {
+        onClose()
+    }, [onClose])
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
@@ -52,13 +63,11 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Post title
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Post title</label>
                         <Input
                             type="text"
                             value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            onChange={handleTitleChange}
                             placeholder="Give your post a title"
                             disabled={createPostMutation.isPending}
                             className="rounded-[4px]"
@@ -66,12 +75,10 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Post content
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Post content</label>
                         <Textarea
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={handleContentChange}
                             placeholder="Write something mind-blowing"
                             rows={8}
                             disabled={createPostMutation.isPending}
@@ -81,28 +88,17 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
 
                     {createPostMutation.error && (
                         <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                            <p className="text-red-600 text-sm">
-                                {createPostMutation.error.message || "Failed to create post"}
-                            </p>
+                            <p className="text-red-600 text-sm">{createPostMutation.error.message || "Failed to create post"}</p>
                         </div>
                     )}
 
                     <DialogFooter className="flex justify-end space-x-3">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                            disabled={createPostMutation.isPending}
-                        >
+                        <Button type="button" variant="ghost" onClick={handleCancel} disabled={createPostMutation.isPending}>
                             Cancel
                         </Button>
                         <Button
                             type="submit"
-                            disabled={
-                                createPostMutation.isPending ||
-                                !title.trim() ||
-                                !content.trim()
-                            }
+                            disabled={createPostMutation.isPending || !title.trim() || !content.trim()}
                             className="rounded-[4px]"
                         >
                             {createPostMutation.isPending ? (
@@ -119,4 +115,3 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
         </Dialog>
     )
 }
-

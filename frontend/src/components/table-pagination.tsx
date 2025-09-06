@@ -1,6 +1,7 @@
 import type React from "react"
 import { memo } from "react"
 import PaginationControls from "@/components/pagination-controls"
+import {useIsMobile} from "@/hooks/use-mobile";
 
 interface TablePaginationProps {
     currentPage: number
@@ -16,25 +17,17 @@ const TablePagination: React.FC<TablePaginationProps> = memo(
             return null
         }
 
+        const isMobile = useIsMobile()
+
         return (
             <div>
                 {/* Mobile pagination - compact */}
-                <div className="flex justify-center mt-8 md:hidden">
+                <div className="flex justify-center md:justify-end mt-8 ">
                     <PaginationControls
                         currentPage={currentPage}
                         pageCount={pageCount}
                         onPageChange={onPageChange}
-                        isMobile={true}
-                    />
-                </div>
-
-                {/* Desktop pagination - expanded */}
-                <div className="hidden md:flex justify-end mt-8">
-                    <PaginationControls
-                        currentPage={currentPage}
-                        pageCount={pageCount}
-                        onPageChange={onPageChange}
-                        isMobile={false}
+                        isMobile={isMobile}
                     />
                 </div>
             </div>

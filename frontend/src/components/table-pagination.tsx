@@ -6,7 +6,7 @@ interface TablePaginationProps {
     currentPage: number;
     pageCount: number;
     isLoading: boolean;
-    error: any;
+    error: Error | null;
     onPageChange: (event: { selected: number }) => void;
 }
 

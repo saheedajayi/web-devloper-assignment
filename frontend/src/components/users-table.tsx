@@ -1,35 +1,46 @@
 "use client"
 
-import {useState, memo} from "react"
-import {useUsers} from "@/hooks/use-users"
-import {User, UserFromAPI} from "@/types/user";
-import Loader from "@/components/loader";
-import TablePagination from "@/components/table-pagination";
+import { useState, memo, useCallback, useMemo } from "react"
+import { useUsers } from "@/hooks/use-users"
+import type { User, UserFromAPI } from "@/types/user"
+import Loader from "@/components/loader"
+import TablePagination from "@/components/table-pagination"
 
 interface UsersTableProps {
     onUserClick: (user: User) => void
 }
 
-function UsersTable({onUserClick}: UsersTableProps) {
+function UsersTable({ onUserClick }: UsersTableProps) {
     const [currentPage, setCurrentPage] = useState(0)
     const itemsPerPage = 4
 
-    const {data, isLoading, error} = useUsers(currentPage, itemsPerPage)
+    const { data, isLoading, error } = useUsers(currentPage, itemsPerPage)
 
-    const handlePageClick = (event: { selected: number }) => {
+    const handlePageClick = useCallback((event: { selected: number }) => {
         setCurrentPage(event.selected)
-    }
+    }, [])
 
-    const mapUserFromAPI = (user: UserFromAPI): User => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        address: [user.street, user.city, user.state, user.zipcode].filter(Boolean).join(', ')
-    })
+    const mapUserFromAPI = useCallback(
+        (user: UserFromAPI): User => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            address: [user.street, user.city, user.state, user.zipcode].filter(Boolean).join(", "),
+        }),
+        [],
+    )
 
-    const users = data?.users.map(mapUserFromAPI) || []
+    const users = useMemo(() => data?.users.map(mapUserFromAPI) || [], [data?.users, mapUserFromAPI])
+
     const totalCount = data?.totalCount || 0
     const pageCount = Math.ceil(totalCount / itemsPerPage)
+
+    const handleUserClick = useCallback(
+        (user: User) => {
+            onUserClick(user)
+        },
+        [onUserClick],
+    )
 
     return (
         <div className="bg-white">
@@ -37,20 +48,14 @@ function UsersTable({onUserClick}: UsersTableProps) {
                 <h1 className="text-5xl font-[500] text-gray-900 mb-8">Users</h1>
 
                 {/* Horizontal scroll container */}
-                <div className="overflow-x-auto border border-gray-200 rounded-lg  ">
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
                     <div className="min-w-full">
-                        <table className="w-full min-w-[640px]"> {/* Set minimum width for the table */}
+                        <table className="w-full min-w-[640px]">
                             <thead>
                             <tr>
-                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[200px]">
-                                    Full Name
-                                </th>
-                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[250px]">
-                                    Email Address
-                                </th>
-                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[200px]">
-                                    Address
-                                </th>
+                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[200px]">Full Name</th>
+                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[250px]">Email Address</th>
+                                <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 min-w-[200px]">Address</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -58,7 +63,7 @@ function UsersTable({onUserClick}: UsersTableProps) {
                                 <tr>
                                     <td colSpan={3} className="py-12">
                                         <div className="flex justify-center items-center">
-                                            <Loader/>
+                                            <Loader />
                                         </div>
                                     </td>
                                 </tr>
@@ -78,7 +83,7 @@ function UsersTable({onUserClick}: UsersTableProps) {
                                     <tr
                                         key={user.id}
                                         className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
-                                        onClick={() => onUserClick(user)}
+                                        onClick={() => handleUserClick(user)}
                                     >
                                         <td className="p-6">
                                             <div className="text-gray-900 font-medium">{user.name}</div>

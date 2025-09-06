@@ -13,15 +13,14 @@ interface TablePaginationProps {
 
 const TablePagination: React.FC<TablePaginationProps> = memo(
     ({ currentPage, pageCount, isLoading, error, onPageChange }) => {
+        const isMobile = useIsMobile()
+
         if (isLoading || error || pageCount <= 1) {
             return null
         }
 
-        const isMobile = useIsMobile()
-
         return (
             <div>
-                {/* Mobile pagination - compact */}
                 <div className="flex justify-center md:justify-end mt-8 ">
                     <PaginationControls
                         currentPage={currentPage}

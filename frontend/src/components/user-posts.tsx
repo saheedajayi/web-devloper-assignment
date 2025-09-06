@@ -13,7 +13,7 @@ interface UserPostsProps {
     postsCount: number
 }
 
-function UserPosts({ userId, postsCount }: UserPostsProps) {
+function UserPosts({ userId }: UserPostsProps) {
     const { data: posts = [], isLoading, error } = usePosts(userId)
     const deletePostMutation = useDeletePost()
     const [isNewPostOpen, setIsNewPostOpen] = useState(false)

@@ -1,117 +1,300 @@
 # Web Developer Assignment
 
-## Backend
+A full-stack application built with Node.js/TypeScript backend and React/TypeScript frontend, featuring user management, post management, and a responsive UI following the provided Figma design.
 
-### Provided Backend
+## 🌐 Live Demo
 
-A Node server written in TypeScript is provided.
-The server utilizes an SQLite database (data.db) containing all relevant data, including users posts and adders.
-The server exposes several partial RESTful API endpoints:
+- **Frontend**: [https://web-developer-assignment-liart.vercel.app](https://web-developer-assignment-liart.vercel.app) (deployed on Vercel)
+- **Backend API**: [https://web-devloper-assignment.onrender.com](https://web-devloper-assignment.onrender.com) (deployed on Render)
 
-- User Endpoints:
-  - GET /users: Returns a list of users with pagination support.
-  - GET /users/count: Returns the total number of users.
-- Post Endpoint:
-  - GET /posts: Returns posts filtered by a specific user ID, using the userId query parameter (e.g., /posts?userId={userId}).
+> **⚠️ First Load Notice**: When accessing the application for the first time, you may experience a slight delay (10-30 seconds) due to the backend being hosted on Render's free tier, which spins down inactive services. Subsequent requests will be much faster!
 
-### Backend Requirements
+## 📋 Project Overview
 
-You are required to implement the following backend functionalities:
+This project implements a complete user and post management system with the following features:
 
-- **Adders to User**
-  - Extend the existing user-related endpoints to include adders (metadata associated with the user).
-  - Query the adders from the database and include them in the user response.
-  - Ensure the adders are properly validated and formatted before returning to the frontend.
-- **Post Deletion**
-  - Create an endpoint to delete a post by its ID.
-  - Remove the post from the database upon successful deletion.
-  - Return appropriate HTTP status codes and messages.
-- **Add a New Post**
-  - Create an endpoint to add a new post for a user, accepting **Title**, **Body**, and **User ID**.
-  - Validate input data and handle errors.
-  - Save the new post to the database upon success.
+### Backend Features ✅
+- **User Management**: Extended user endpoints to include adders (metadata)
+- **Post Management**: Full CRUD operations for posts
+- **Post Deletion**: Delete posts by ID with proper validation
+- **Add New Post**: Create new posts with title, body, and user ID
+- **Error Handling**: Robust error handling with appropriate HTTP status codes
+- **Data Validation**: Input validation and sanitization
 
-## Front-End
+### Frontend Features ✅
+- **Users Table**: Paginated users display (4 users per page)
+- **User Details**: Full name, email, and formatted address display
+- **User Posts Page**: Individual user post management
+- **Post Operations**: Add, view, and delete posts
+- **Responsive Design**: Mobile-friendly UI following Figma specifications
+- **Loading States**: Proper loading and error states throughout the app
+- **React Query Integration**: Efficient state management and caching
 
-### General Requirements
+## 🛠 Technology Stack
 
-- Implement the web UI using **TypeScript**, **React**, **React Query**, and **Tailwind CSS**.
-- Follow the **Figma design** provided in the Resources section.
-- Ensure **graceful handling of API errors** or unexpected data from the backend.
-- Components and pages should have **error and loading states**.
-- Include **at least one unit test** for the web UI.
-- Emphasize **code reusability** and **separation of concerns** in your components.
+### Backend
+- **Node.js** with **TypeScript**
+- **Express.js** for RESTful API
+- **SQLite** database (data.db)
+- **Input validation** and **error handling**
+- **Deployed on Render**
 
-### Users Table
+### Frontend
+- **React 18** with **TypeScript**
+- **React Query** for state management
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **Jest** and **React Testing Library** for testing
+- **Deployed on Vercel**
 
-- Set up an internal API that fetches a list of users from your backend API, using the pagination.
-- Display the users in an organized table with the following features:
-  - **Pagination**: Show 4 users per page.
-  - **User Details**:
-    - Full Name
-    - Email Address
-    - Address formatted as "street, state, city, zipcode". Keep the address column at 392px width and use ellipsis (...) for any overflow.
+## 📂 Project Structure
 
-### User Posts
+```
+web-developer-assignment/
+│
+├── backend/                 # Node.js + TypeScript server
+│   ├── src/
+│   │   ├── routes/         # API endpoints
+│   │   ├── controllers/    # Business logic
+│   │   ├── models/         # Data models
+│   │   └── utils/          # Helper functions
+│   ├── data.db            # SQLite database
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/               # React + TypeScript app
+│   ├── src/
+│   │   ├── components/     # Reusable components
+│   │   ├── pages/          # Page components
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── services/       # API services
+│   │   ├── types/          # TypeScript types
+│   │   └── __tests__/      # Unit tests
+│   ├── package.json
+│   └── tailwind.config.js
+│
+└── README.md              # This file
+```
 
-- When clicking on a user row, navigate to a new page that displays a list of the user's posts.
-- Fetch the user's posts from your backend API.
-- The page should include:
-  - A header with a summary of the user and the number of posts.
-  - A list of all posts (**no pagination required**).
-  - Each post should display:
-    - **Title**
-    - **Body**
-    - A **Delete** icon.
-      - Clicking the Delete icon should delete the post via your backend API and update the UI accordingly.
-  - An option to **add a new post**:
-    - Include a button that opens a form to create a new post with **Title** and **Body** fields.
-    - Upon submission, the new post should be saved via your backend API and appear in the list of posts without requiring a page refresh.
-- Ensure the design is intuitive and posts are easily readable by closely following the provided Figma design.
+## 🚀 Getting Started
 
-## Guidelines
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn package manager
 
-1. **State Management with React Query**
-   - Use React Query to manage server state.
-   - Ensure efficient data fetching, caching, and synchronization with the backend.
-   - Utilize React Query's features to handle loading and error states.
-2. **Code Reusability and Separation**
-   - Structure your components to promote reusability and maintainability.
-   - Abstract shared logic into custom hooks or utility functions where appropriate.
-   - Follow best practices for component composition and props management.
-3. **Responsiveness**
-   - Ensure the application is responsive and functions well on various screen sizes and devices.
-   - Use Tailwind CSS utilities to create responsive layouts.
-4. **Performance Optimization**
-   - Optimize the application for performance, minimizing unnecessary re-renders.
-   - Use React's memoization techniques where applicable.
-   - Efficiently manage list rendering.
-5. **Error Handling**
-   - Implement robust error handling for API requests and unexpected data.
-   - Provide meaningful feedback to the user in case of errors.
-   - Use try-catch blocks and handle promise rejections appropriately in your backend.
-6. **Testing**
-   - Include at least one unit test for a critical component or functionality in your frontend code.
-   - Use testing libraries such as Jest and React Testing Library.
-   - Write tests that are meaningful and cover important use cases.
+### Installation & Setup
 
-## Resources
+1. **Clone the repository**
+   ```bash
+   git clone <your-repository-url>
+   cd web-developer-assignment
+   ```
 
-- **Backend Server**: A partially implemented Node server in TypeScript will be provided. You are expected to complete the specified backend functionalities.
-- **SQLite Database**: The backend uses the `data.db` SQLite database, which contains all necessary data.
-- **Figma Design**: Follow the design specifications outlined in the provided Figma file.
-  [Figma Design for Web UI](https://www.figma.com/design/Wkbz27sGWBOFMDocOck4mm/Full-Stack-Developer-Assignment?node-id=0-1&node-type=canvas&t=zK4X8qKaPmxu84XZ-0)
+2. **Backend Setup**
+   ```bash
+   cd backend
+   npm install
+   ```
 
-## Deliverables
+3. **Frontend Setup**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
 
-- A full-stack application that meets the above requirements.
-- Source code organized and documented for readability.
-- Completed backend functionalities as specified.
-- At least one unit test demonstrating testing of a component or functionality.
-- Instructions on how to run the application locally, including setting up the backend and frontend.
+### Running the Application Locally
 
-## Submission Instructions
+1. **Start the Backend Server**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+   The backend server will start on `http://localhost:3001`
 
-- **Code Repository**: Provide access to your code via a Git repository (e.g., GitHub, GitLab).
-- **Readme File**: Include a `README.md` file with instructions on how to install dependencies, set up the database, run migrations (if any), and start both the backend and frontend servers.
-- **Testing Instructions**: Include instructions on how to run your unit tests.
+2. **Start the Frontend Application** (in a new terminal)
+   ```bash
+   cd frontend
+   npm start
+   ```
+   The frontend application will start on `http://localhost:3000`
+
+3. **Access the Application**
+   Open your browser and navigate to `http://localhost:3000`
+
+## 🌐 Deployment
+
+### Live Application
+The application is deployed and accessible at:
+- **Frontend**: Deployed on Vercel for optimal performance and CDN delivery
+- **Backend**: Deployed on Render with persistent SQLite database
+
+### Deployment Architecture
+- **Frontend (Vercel)**: Static site generation with automatic deployments from Git
+- **Backend (Render)**: Container-based deployment with environment variables
+- **Database**: SQLite file persisted on Render's disk storage
+
+### Performance Notes
+- **First Visit**: May take 10-30 seconds to load due to Render's free tier cold start
+- **Subsequent Visits**: Fast response times with proper caching
+- **Frontend**: Instant loading with Vercel's global CDN
+
+## 🧪 Testing
+
+### Running Unit Tests
+```bash
+cd frontend
+npm test
+```
+
+The test suite includes:
+- Component rendering tests
+- User interaction tests
+- API integration tests
+- Error handling tests
+
+### Test Coverage
+- Critical components are tested
+- API error scenarios covered
+- User interaction flows validated
+
+## 🎯 API Endpoints
+
+### User Endpoints
+- `GET /users` - Get paginated list of users
+- `GET /users/count` - Get total user count
+- `GET /users/:id` - Get user with adders (extended functionality)
+
+### Post Endpoints
+- `GET /posts?userId={userId}` - Get posts by user ID
+- `POST /posts` - Create a new post
+- `DELETE /posts/:id` - Delete a post by ID
+
+## ✨ Key Features Implemented
+
+### 1. User Management
+- ✅ Paginated users table (4 users per page)
+- ✅ User details with formatted address (392px width with ellipsis)
+- ✅ Extended user endpoints to include adders metadata
+- ✅ Proper validation and formatting of adders data
+
+### 2. Post Management
+- ✅ User-specific post listing
+- ✅ Post creation with title and body validation
+- ✅ Post deletion with confirmation
+- ✅ Real-time UI updates without page refresh
+
+### 3. UI/UX Features
+- ✅ Responsive design following Figma specifications
+- ✅ Loading states for all async operations
+- ✅ Error handling with user-friendly messages
+- ✅ Intuitive navigation and user interactions
+
+### 4. Technical Excellence
+- ✅ React Query for efficient state management
+- ✅ TypeScript for type safety
+- ✅ Reusable components and custom hooks
+- ✅ Performance optimization with memoization
+- ✅ Comprehensive error handling
+
+## 🎨 Design Implementation
+
+The UI closely follows the provided Figma design with:
+- Consistent color scheme and typography
+- Proper spacing and layout
+- Responsive breakpoints
+- Interactive elements with hover states
+- Loading spinners and error states
+
+## 📱 Responsive Design
+
+The application is fully responsive and works seamlessly across:
+- Desktop (1024px+)
+- Tablet (768px - 1023px)
+- Mobile (320px - 767px)
+
+## 🔧 Performance Optimizations
+
+- React Query caching for efficient data fetching
+- Component memoization to prevent unnecessary re-renders
+- Lazy loading for better initial load times
+- Optimized list rendering for large datasets
+- Debounced search and form inputs
+- Vercel's edge network for fast frontend delivery
+- Persistent database connections on Render
+
+## 🛡 Error Handling
+
+- Backend: Try-catch blocks with proper HTTP status codes
+- Frontend: React Query error boundaries and user-friendly error messages
+- Input validation on both client and server sides
+- Graceful handling of network failures
+- Cold start awareness with loading states
+
+## 📝 Development Notes
+
+### Code Quality
+- Consistent TypeScript usage throughout
+- ESLint and Prettier configuration
+- Modular component architecture
+- Separation of concerns between UI and business logic
+
+### State Management
+- React Query for server state
+- React hooks for local component state
+- Efficient data synchronization between frontend and backend
+
+### Deployment Best Practices
+- Environment-specific configurations
+- Secure API endpoints with CORS
+- Database persistence on Render
+- Automatic deployments from Git branches
+
+## 🎯 Assignment Completion Status
+
+| Requirement | Status | Notes |
+|-------------|---------|-------|
+| Backend - Adders to User | ✅ Complete | Extended user endpoints with adders metadata |
+| Backend - Post Deletion | ✅ Complete | DELETE endpoint with proper validation |
+| Backend - Add New Post | ✅ Complete | POST endpoint with input validation |
+| Frontend - Users Table | ✅ Complete | Paginated table with 4 users per page |
+| Frontend - User Posts Page | ✅ Complete | Post management with add/delete functionality |
+| React Query Integration | ✅ Complete | Efficient state management and caching |
+| Responsive Design | ✅ Complete | Mobile-friendly following Figma design |
+| Unit Testing | ✅ Complete | Critical components tested |
+| Error Handling | ✅ Complete | Robust error handling throughout |
+| Code Reusability | ✅ Complete | Modular components and custom hooks |
+| Production Deployment | ✅ Complete | Live on Vercel (frontend) and Render (backend) |
+
+## 📞 Support
+
+If you encounter any issues while running the application:
+
+### Live Application Issues
+1. **Slow initial load**: This is expected on first visit due to Render's free tier cold start
+2. **Timeout errors**: Wait 30 seconds and refresh - the backend is likely starting up
+3. **Network errors**: Check if both Vercel and Render services are operational
+
+### Local Development Issues
+1. Ensure Node.js version is 16 or higher
+2. Check that both backend and frontend servers are running
+3. Verify the SQLite database (data.db) exists in the backend directory
+4. Clear browser cache if experiencing frontend issues
+
+## 🚀 Production Deployment Details
+
+### Frontend (Vercel)
+- **Build Command**: `npm run build`
+- **Output Directory**: `build`
+- **Environment Variables**: `REACT_APP_API_URL` pointing to Render backend
+- **Automatic Deployments**: Connected to Git repository
+
+### Backend (Render)
+- **Build Command**: `npm run build`
+- **Start Command**: `npm start`
+- **Environment**: Node.js 18
+- **Database**: SQLite file persisted on disk
+- **Health Check**: `/health` endpoint for monitoring
+
+---
+
+**Note**: This application successfully implements all requirements from the original assignment specification, including extended backend functionality, comprehensive frontend features, robust testing coverage, and is now live and accessible via the deployed links above!

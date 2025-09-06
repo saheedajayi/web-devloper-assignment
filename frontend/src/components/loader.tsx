@@ -1,20 +1,10 @@
-// const Loader = () => {
-//     return (
-//         <div className="lds-ellipsis">
-//             <div></div><div></div><div></div><div></div>
-//         </div>
-//     );
-// };
-//
-// export default Loader;
-
 interface LoaderProps {
-    size?: number; // default 80
+    size?: number;
 }
 
 const Loader = ({ size = 80 }: LoaderProps) => {
-    const circleSize = size / 6; // proportional scaling
-    const top = size / 2.4;      // keeps it centered
+    const circleSize = size / 6;
+    const top = size / 2.4;
 
     return (
         <div

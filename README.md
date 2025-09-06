@@ -86,7 +86,7 @@ web-developer-assignment/
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/saheedajayi/web-devloper-assignment.git
    cd web-developer-assignment
    ```
 

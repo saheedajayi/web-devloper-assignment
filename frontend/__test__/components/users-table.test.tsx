@@ -7,7 +7,7 @@ import {UserFactory} from "../factories/user.factory"
 import {UserService} from "@/services/user.service"
 import UsersTable from "@/components/users-table"
 
-// Mock window.matchMedia before any component imports
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -22,7 +22,6 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// Mock axios before importing anything that uses it
 jest.mock("axios", () => ({
   create: jest.fn(() => ({
     interceptors: {
@@ -38,11 +37,9 @@ jest.mock("axios", () => ({
   isAxiosError: jest.fn(),
 }))
 
-// Mock the UserService
 jest.mock("@/services/user.service")
 const mockedUserService = jest.mocked(UserService)
 
-// Mock Next.js router
 const mockPush = jest.fn()
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -50,7 +47,6 @@ jest.mock("next/navigation", () => ({
   }),
 }))
 
-// Create a test wrapper with QueryClient
 const createTestQueryClient = () =>
     new QueryClient({
       defaultOptions: {
@@ -70,7 +66,6 @@ describe("UsersTable", () => {
   })
 
   it("renders loading state initially", () => {
-    // Mock pending promise
     mockedUserService.getUsers.mockReturnValue(new Promise(() => {
     }))
 
@@ -80,7 +75,6 @@ describe("UsersTable", () => {
         </TestWrapper>,
     )
 
-    // Check for table headers and loader
     expect(screen.getByText("Users")).toBeInTheDocument()
     expect(screen.getByText("Full Name")).toBeInTheDocument()
     expect(screen.getByText("Email Address")).toBeInTheDocument()
@@ -88,7 +82,6 @@ describe("UsersTable", () => {
   })
 
   it("renders users table with data", async () => {
-    // Create mock users using factory
     const mockUsers = UserFactory.buildList(3)
     const mockResponse = {
       users: mockUsers,
@@ -103,19 +96,16 @@ describe("UsersTable", () => {
         </TestWrapper>,
     )
 
-    // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Check if users are rendered - fix for multiple elements with same email
     mockUsers.forEach(user => {
       const row = screen.getByText(user.name).closest("tr")!
-      // Use getAllByText to handle multiple email elements, then check within the row
+
       const emailElements = screen.getAllByText(user.email)
       expect(emailElements.length).toBeGreaterThan(0)
 
-      // Verify the email exists within this specific row
       expect(within(row).getAllByText(user.email)[0]).toBeInTheDocument()
     })
   })
@@ -139,7 +129,7 @@ describe("UsersTable", () => {
     const mockUsers = UserFactory.buildList(4)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 20, // More than one page (5 pages total)
+      totalCount: 20,
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
@@ -154,15 +144,12 @@ describe("UsersTable", () => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Check for single pagination instance
     const pageOneButtons = screen.getAllByText("1")
     expect(pageOneButtons.length).toBeGreaterThanOrEqual(1)
 
-    // Verify pagination navigation exists
     const paginationNav = screen.queryByRole('navigation')
     expect(paginationNav).toBeInTheDocument()
 
-    // Check for page 5 (last page based on totalCount=20, itemsPerPage=4)
     expect(screen.getByText("5")).toBeInTheDocument()
   })
 
@@ -170,7 +157,7 @@ describe("UsersTable", () => {
     const mockUsers = UserFactory.buildList(4)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 12, // 3 pages total
+      totalCount: 12,
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
@@ -185,12 +172,10 @@ describe("UsersTable", () => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Check that pagination renders with correct page count
     expect(screen.getByText("1")).toBeInTheDocument()
     expect(screen.getByText("2")).toBeInTheDocument()
     expect(screen.getByText("3")).toBeInTheDocument()
 
-    // Verify we're on page 1 by checking for active styling
     const pageOneButton = screen.getByText("1")
     expect(pageOneButton.closest('a')).toHaveClass('!text-blue-600')
   })
@@ -221,7 +206,7 @@ describe("UsersTable", () => {
     const mockUsers = UserFactory.buildList(2)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 2, // Less than itemsPerPage (4), so only 1 page
+      totalCount: 2,
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
@@ -236,7 +221,6 @@ describe("UsersTable", () => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Pagination should not be rendered
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
@@ -268,7 +252,6 @@ describe("UsersTable", () => {
       expect(screen.getByText("John Doe")).toBeInTheDocument()
     })
 
-    // Check that the address is formatted correctly
     expect(screen.getByText("123 Main St, New York, NY, 10001")).toBeInTheDocument()
   })
 })

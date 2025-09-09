@@ -3,7 +3,6 @@ import { UserService } from "@/services/user.service"
 import { apiClient } from "@/lib/api"
 import "@testing-library/jest-dom"
 
-// Mock the entire api module
 jest.mock("@/lib/api", () => ({
     apiClient: {
         get: jest.fn(),
@@ -13,10 +12,8 @@ jest.mock("@/lib/api", () => ({
     })
 }))
 
-// Type the mocked apiClient
 const mockedApiClient = apiClient as jest.Mocked<typeof apiClient>
 
-// Set environment variable
 process.env.NEXT_PUBLIC_BACKEND_URL = "http://localhost:3001"
 
 describe("UserService", () => {
@@ -29,14 +26,12 @@ describe("UserService", () => {
             const mockUsers = UserFactory.buildList(3)
             const mockCountResponse = { count: 10 }
 
-            // Mock the apiClient.get calls in the order they're called
             mockedApiClient.get
                 .mockResolvedValueOnce({ data: mockUsers })
                 .mockResolvedValueOnce({ data: mockCountResponse })
 
             const result = await UserService.getUsers()
 
-            // Verify the calls were made correctly with default params
             expect(mockedApiClient.get).toHaveBeenCalledTimes(2)
             expect(mockedApiClient.get).toHaveBeenNthCalledWith(1, "/users", {
                 params: { pageNumber: 0, pageSize: 4 },
@@ -76,7 +71,6 @@ describe("UserService", () => {
 
             await expect(UserService.getUsers()).rejects.toThrow("Failed to fetch users")
 
-            // Promise.all starts both requests, so both calls are made even if one fails
             expect(mockedApiClient.get).toHaveBeenCalledTimes(2)
             expect(mockedApiClient.get).toHaveBeenNthCalledWith(1, "/users", {
                 params: { pageNumber: 0, pageSize: 4 },
@@ -87,7 +81,6 @@ describe("UserService", () => {
         it("throws error when count API fails", async () => {
             const mockUsers = UserFactory.buildList(3)
 
-            // First call succeeds, second call fails
             mockedApiClient.get
                 .mockResolvedValueOnce({ data: mockUsers })
                 .mockRejectedValueOnce(new Error("Count API Error"))
@@ -148,7 +141,6 @@ describe("UserService", () => {
 
     describe("Error handling", () => {
         it("handles Promise.all rejection in getUsers", async () => {
-            // Test when the Promise.all itself fails
             mockedApiClient.get.mockRejectedValue(new Error("Promise.all failure"))
 
             await expect(UserService.getUsers()).rejects.toThrow("Failed to fetch users")

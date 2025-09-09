@@ -7,11 +7,46 @@ import {UserFactory} from "../factories/user.factory"
 import {UserService} from "@/services/user.service"
 import UsersTable from "@/components/users-table"
 
-// Mock the UserService
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
+
+jest.mock("axios", () => ({
+  create: jest.fn(() => ({
+    interceptors: {
+      response: {
+        use: jest.fn(),
+      },
+    },
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  })),
+  isAxiosError: jest.fn(),
+}))
+
 jest.mock("@/services/user.service")
 const mockedUserService = jest.mocked(UserService)
 
-// Create a test wrapper with QueryClient
+const mockPush = jest.fn()
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}))
+
 const createTestQueryClient = () =>
     new QueryClient({
       defaultOptions: {
@@ -26,24 +61,20 @@ const TestWrapper = ({children}: { children: React.ReactNode }) => {
 }
 
 describe("UsersTable", () => {
-  const mockOnUserClick = jest.fn()
-
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it("renders loading state initially", () => {
-    // Mock pending promise
     mockedUserService.getUsers.mockReturnValue(new Promise(() => {
     }))
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick}/>
+          <UsersTable />
         </TestWrapper>,
     )
 
-    // Check for table headers and loader
     expect(screen.getByText("Users")).toBeInTheDocument()
     expect(screen.getByText("Full Name")).toBeInTheDocument()
     expect(screen.getByText("Email Address")).toBeInTheDocument()
@@ -51,7 +82,6 @@ describe("UsersTable", () => {
   })
 
   it("renders users table with data", async () => {
-    // Create mock users using factory
     const mockUsers = UserFactory.buildList(3)
     const mockResponse = {
       users: mockUsers,
@@ -62,23 +92,20 @@ describe("UsersTable", () => {
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick}/>
+          <UsersTable />
         </TestWrapper>,
     )
 
-    // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Check if users are rendered - fix for multiple elements with same email
     mockUsers.forEach(user => {
       const row = screen.getByText(user.name).closest("tr")!
-      // Use getAllByText to handle multiple email elements, then check within the row
+
       const emailElements = screen.getAllByText(user.email)
       expect(emailElements.length).toBeGreaterThan(0)
 
-      // Verify the email exists within this specific row
       expect(within(row).getAllByText(user.email)[0]).toBeInTheDocument()
     })
   })
@@ -88,7 +115,7 @@ describe("UsersTable", () => {
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick} />
+          <UsersTable />
         </TestWrapper>,
     )
 
@@ -102,14 +129,14 @@ describe("UsersTable", () => {
     const mockUsers = UserFactory.buildList(4)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 20, // More than one page (5 pages total)
+      totalCount: 20,
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick} />
+          <UsersTable />
         </TestWrapper>,
     )
 
@@ -117,31 +144,27 @@ describe("UsersTable", () => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Use getAllByText to handle multiple pagination instances (mobile + desktop)
     const pageOneButtons = screen.getAllByText("1")
-    expect(pageOneButtons).toHaveLength(2) // Should have 2 instances (mobile + desktop)
+    expect(pageOneButtons.length).toBeGreaterThanOrEqual(1)
 
-    // Verify pagination navigation exists by checking for navigation role
-    const paginationNav = screen.getAllByRole('navigation')
-    expect(paginationNav).toHaveLength(2) // Mobile and desktop versions
+    const paginationNav = screen.queryByRole('navigation')
+    expect(paginationNav).toBeInTheDocument()
 
-    // Check for page 5 (last page based on totalCount=20, itemsPerPage=4)
-    const pageFiveButtons = screen.getAllByText("5")
-    expect(pageFiveButtons.length).toBeGreaterThan(0)
+    expect(screen.getByText("5")).toBeInTheDocument()
   })
 
   it("handles pagination navigation", async () => {
     const mockUsers = UserFactory.buildList(4)
     const mockResponse = {
       users: mockUsers,
-      totalCount: 12, // 3 pages total
+      totalCount: 12,
     }
 
     mockedUserService.getUsers.mockResolvedValue(mockResponse)
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick} />
+          <UsersTable />
         </TestWrapper>,
     )
 
@@ -149,18 +172,15 @@ describe("UsersTable", () => {
       expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
     })
 
-    // Check that pagination renders with correct page count (using getAllByText for duplicates)
-    expect(screen.getAllByText("1")).toHaveLength(2) // Mobile + desktop
-    expect(screen.getAllByText("2")).toHaveLength(2)
-    expect(screen.getAllByText("3")).toHaveLength(2)
+    expect(screen.getByText("1")).toBeInTheDocument()
+    expect(screen.getByText("2")).toBeInTheDocument()
+    expect(screen.getByText("3")).toBeInTheDocument()
 
-    // Verify we're on page 1 by checking for active styling
-    const pageOneButtons = screen.getAllByText("1")
-    expect(pageOneButtons[0].closest('a')).toHaveClass('!text-blue-600')
-    expect(pageOneButtons[1].closest('a')).toHaveClass('!text-blue-600')
+    const pageOneButton = screen.getByText("1")
+    expect(pageOneButton.closest('a')).toHaveClass('!text-blue-600')
   })
 
-  it("calls onUserClick when user row is clicked", async () => {
+  it("navigates to user detail page when user row is clicked", async () => {
     const mockUsers = UserFactory.buildList(1)
     const mockResponse = { users: mockUsers, totalCount: 1 }
 
@@ -168,7 +188,7 @@ describe("UsersTable", () => {
 
     render(
         <TestWrapper>
-          <UsersTable onUserClick={mockOnUserClick} />
+          <UsersTable />
         </TestWrapper>,
     )
 
@@ -179,15 +199,59 @@ describe("UsersTable", () => {
     const userRow = screen.getByText(mockUsers[0].name).closest("tr")
     await userEvent.click(userRow!)
 
-    // Map API user to expected User object
-    const expectedUser = {
-      id: mockUsers[0].id,
-      name: mockUsers[0].name,
-      email: mockUsers[0].email,
-      address: `${mockUsers[0].street}, ${mockUsers[0].city}, ${mockUsers[0].state}, ${mockUsers[0].zipcode}`,
-    }
-
-    expect(mockOnUserClick).toHaveBeenCalledWith(expectedUser)
+    expect(mockPush).toHaveBeenCalledWith(`/user/${mockUsers[0].id}`)
   })
 
+  it("does not show pagination when there is only one page or less", async () => {
+    const mockUsers = UserFactory.buildList(2)
+    const mockResponse = {
+      users: mockUsers,
+      totalCount: 2,
+    }
+
+    mockedUserService.getUsers.mockResolvedValue(mockResponse)
+
+    render(
+        <TestWrapper>
+          <UsersTable />
+        </TestWrapper>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(mockUsers[0].name)).toBeInTheDocument()
+    })
+
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it("formats user address correctly", async () => {
+    const mockUsers = [
+      {
+        id: "1",
+        name: "John Doe",
+        email: "john@example.com",
+        username: "johndoe",
+        phone: "555-1234",
+        street: "123 Main St",
+        city: "New York",
+        state: "NY",
+        zipcode: "10001"
+      }
+    ]
+    const mockResponse = { users: mockUsers, totalCount: 1 }
+
+    mockedUserService.getUsers.mockResolvedValue(mockResponse)
+
+    render(
+        <TestWrapper>
+          <UsersTable />
+        </TestWrapper>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+    })
+
+    expect(screen.getByText("123 Main St, New York, NY, 10001")).toBeInTheDocument()
+  })
 })

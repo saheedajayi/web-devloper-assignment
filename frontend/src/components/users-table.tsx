@@ -1,18 +1,16 @@
 "use client"
 
 import { useState, memo, useCallback, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { useUsers } from "@/hooks/use-users"
 import type { User, UserFromAPI } from "@/types/user"
 import Loader from "@/components/loader"
 import TablePagination from "@/components/table-pagination"
 
-interface UsersTableProps {
-    onUserClick: (user: User) => void
-}
-
-function UsersTable({ onUserClick }: UsersTableProps) {
+function UsersTable() {
     const [currentPage, setCurrentPage] = useState(0)
     const itemsPerPage = 4
+    const router = useRouter()
 
     const { data, isLoading, error } = useUsers(currentPage, itemsPerPage)
 
@@ -37,9 +35,9 @@ function UsersTable({ onUserClick }: UsersTableProps) {
 
     const handleUserClick = useCallback(
         (user: User) => {
-            onUserClick(user)
+            router.push(`/user/${user.id}`)
         },
-        [onUserClick],
+        [router],
     )
 
     return (
@@ -47,7 +45,6 @@ function UsersTable({ onUserClick }: UsersTableProps) {
             <div className="p-6">
                 <h1 className="text-5xl font-[500] text-gray-900 mb-8">Users</h1>
 
-                {/* Horizontal scroll container */}
                 <div className="overflow-x-auto border border-gray-200 rounded-lg">
                     <div className="min-w-full">
                         <table className="w-full min-w-[640px]">

@@ -49,10 +49,13 @@ function UserPosts({ userId }: UserPostsProps) {
             )
         }
 
+        // Reverse the posts array so the last comes first, then add the AddPostCard
+        const reversedPosts = [...posts].reverse()
+
         return (
             <>
                 <AddPostCard onAddPost={handleOpenNewPost} />
-                {posts.map((post: Post) => (
+                {reversedPosts.map((post: Post) => (
                     <PostCard key={post.id} post={post} onDelete={handleDeletePost} isDeleting={deletePostMutation.isPending} />
                 ))}
             </>

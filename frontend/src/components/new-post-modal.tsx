@@ -16,6 +16,9 @@ interface NewPostModalProps {
     onClose: () => void
 }
 
+const TITLE_MAX_LENGTH = 100
+const BODY_MAX_LENGTH = 500
+
 export default function NewPostModal({ userId, open, onClose }: NewPostModalProps) {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
@@ -24,7 +27,7 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
     const handleSubmit = useCallback(
         async (e: FormEvent) => {
             e.preventDefault()
-            if (title.trim() && content.trim()) {
+            if (title.trim() && content.trim() && title.length <= TITLE_MAX_LENGTH && content.length <= BODY_MAX_LENGTH) {
                 try {
                     await createPostMutation.mutateAsync({
                         title: title.trim(),
@@ -43,47 +46,83 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
     )
 
     const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value)
+        const value = e.target.value
+        // Allow typing but truncate if over limit
+        setTitle(value.slice(0, TITLE_MAX_LENGTH))
     }, [])
 
     const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setContent(e.target.value)
+        const value = e.target.value
+        // Allow typing but truncate if over limit
+        setContent(value.slice(0, BODY_MAX_LENGTH))
     }, [])
 
     const handleCancel = useCallback(() => {
         onClose()
     }, [onClose])
 
+    // Check character limit status
+    const titleAtLimit = title.length >= TITLE_MAX_LENGTH
+    const contentAtLimit = content.length >= BODY_MAX_LENGTH
+    const titleNearLimit = title.length >= TITLE_MAX_LENGTH * 0.9
+    const contentNearLimit = content.length >= BODY_MAX_LENGTH * 0.9
+
+    // Helper function to get counter color
+    const getCounterColor = (length: number, maxLength: number) => {
+        if (length >= maxLength) return 'text-red-500 font-medium'
+        if (length >= maxLength * 0.9) return 'text-amber-500 font-medium'
+        return 'text-gray-500'
+    }
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md h-[600px] flex flex-col">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold">New Post</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Post title</label>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-sm font-medium text-gray-700">Post title</label>
+                            {title.length > 0 && (
+                                <span className={`text-xs ${getCounterColor(title.length, TITLE_MAX_LENGTH)}`}>
+                                    {title.length}/{TITLE_MAX_LENGTH}
+                                </span>
+                            )}
+                        </div>
                         <Input
                             type="text"
                             value={title}
                             onChange={handleTitleChange}
                             placeholder="Give your post a title"
                             disabled={createPostMutation.isPending}
-                            className="rounded-[4px]"
+                            className={`rounded-[4px] ${titleAtLimit ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : titleNearLimit ? 'border-amber-300 focus:border-amber-500 focus:ring-amber-500' : ''}`}
                         />
+                        {titleAtLimit && (
+                            <p className="text-xs text-red-500 mt-1">Character limit reached</p>
+                        )}
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Post content</label>
+                    <div className="flex-1 flex flex-col">
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-sm font-medium text-gray-700">Post content</label>
+                            {content.length > 0 && (
+                                <span className={`text-xs ${getCounterColor(content.length, BODY_MAX_LENGTH)}`}>
+                                    {content.length}/{BODY_MAX_LENGTH}
+                                </span>
+                            )}
+                        </div>
                         <Textarea
                             value={content}
                             onChange={handleContentChange}
                             placeholder="Write something mind-blowing"
-                            rows={8}
                             disabled={createPostMutation.isPending}
-                            className="h-[179px] rounded-[4px]"
+                            className={`max-h-[300px] rounded-[4px] resize-none flex-1 overflow-auto ${contentAtLimit ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : contentNearLimit ? 'border-amber-300 focus:border-amber-500 focus:ring-amber-500' : ''}`}
                         />
+                        {contentAtLimit && (
+                            <p className="text-xs text-red-500 mt-1">Character limit reached</p>
+                        )}
                     </div>
 
                     {createPostMutation.error && (
@@ -98,7 +137,13 @@ export default function NewPostModal({ userId, open, onClose }: NewPostModalProp
                         </Button>
                         <Button
                             type="submit"
-                            disabled={createPostMutation.isPending || !title.trim() || !content.trim()}
+                            disabled={
+                                createPostMutation.isPending ||
+                                !title.trim() ||
+                                !content.trim() ||
+                                title.length > TITLE_MAX_LENGTH ||
+                                content.length > BODY_MAX_LENGTH
+                            }
                             className="rounded-[4px]"
                         >
                             {createPostMutation.isPending ? (

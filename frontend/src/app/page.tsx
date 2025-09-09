@@ -1,14 +1,12 @@
-// "use client"
-// import dynamic from "next/dynamic"
-//
-// const MainPage = dynamic(() => import("@/components/main-page"), {
-//   ssr: false,
-//   loading: () => <div className="min-h-screen flex justify-center items-center">Loading...</div>,
-// })
+import UsersTable from "@/components/users-table"
 
-
-import MainPage from "@/components/main-page";
 
 export default function Home() {
-  return <MainPage />
+    return (
+        <div className="min-h-screen w-full">
+            <div className="mx-auto max-w-5xl p-4 sm:p-8">
+                <UsersTable/>
+            </div>
+        </div>
+    )
 }

@@ -1,22 +1,47 @@
 "use client"
 
 import { memo, useCallback } from "react"
-import type { User } from "@/types/user"
+import { useRouter } from "next/navigation"
+import { useUsers } from "@/hooks/use-users"
 import { usePosts } from "@/hooks/use-posts"
 import UserPosts from "@/components/user-posts"
 import { ArrowLeft } from "lucide-react"
 
 interface UserProfileProps {
-    user: User
-    onBack: () => void
+    userId: string
 }
 
-function UserProfile({ user, onBack }: UserProfileProps) {
-    const { data: posts = [] } = usePosts(user.id.toString())
+function UserProfile({ userId }: UserProfileProps) {
+    const router = useRouter()
+    const { data: usersData } = useUsers(0, 100)
+    const { data: posts = [] } = usePosts(userId)
+
+    // Find the user from the users data
+    const user = usersData?.users.find((u) => u.id.toString() === userId)
 
     const handleBack = useCallback(() => {
-        onBack()
-    }, [onBack])
+        router.push("/")
+    }, [router])
+
+    if (!user) {
+        return (
+            <div className="bg-white">
+                <div className="p-4 sm:p-6">
+                    <button
+                        onClick={handleBack}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors cursor-pointer"
+                        aria-label="Back to users list"
+                    >
+                        <ArrowLeft size={20} />
+                        Back to Users
+                    </button>
+                    <div className="text-center py-12">
+                        <p className="text-gray-600">User not found</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="bg-white">
@@ -35,7 +60,7 @@ function UserProfile({ user, onBack }: UserProfileProps) {
                     {user.email} • {posts.length} Posts
                 </p>
 
-                <UserPosts userId={user.id.toString()} postsCount={posts.length} />
+                <UserPosts userId={userId} postsCount={posts.length} />
             </div>
         </div>
     )

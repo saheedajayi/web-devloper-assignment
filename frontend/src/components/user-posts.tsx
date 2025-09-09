@@ -49,7 +49,6 @@ function UserPosts({ userId }: UserPostsProps) {
             )
         }
 
-        // Reverse the posts array so the last comes first, then add the AddPostCard
         const reversedPosts = [...posts].reverse()
 
         return (
